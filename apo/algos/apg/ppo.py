@@ -37,12 +37,12 @@ class AveragePPO(AveragePolicyGradientAlgo):
         linear_lr_schedule=True,
         normalize_advantage=False,
     ):
-        self.eta = None  # initial estimation of average performance
-        self.value_bias = None  # initial estimation of average performance
         """Saves input settings."""
         if optim_kwargs is None:
             optim_kwargs = dict()
         save__init__args(locals())
+        self.eta = None  # initial estimation of average performance
+        self.value_bias = None  # initial estimation of average performance
 
     def initialize(self, *args, **kwargs):
         """

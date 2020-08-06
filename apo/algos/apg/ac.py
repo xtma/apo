@@ -2,13 +2,12 @@ import torch
 
 from apo.algos.apg.base import AveragePolicyGradientAlgo, OptInfo
 from rlpyt.agents.base import AgentInputs
-
-from rlpyt.utils.tensor import valid_mean
-from rlpyt.utils.quick_args import save__init__args
 from rlpyt.utils.buffer import buffer_method
+from rlpyt.utils.quick_args import save__init__args
+from rlpyt.utils.tensor import valid_mean
 
 
-class AverageA2C(AveragePolicyGradientAlgo):
+class AverageAC(AveragePolicyGradientAlgo):
     """
     Advantage Actor Critic algorithm (synchronous).  Trains the agent by
     taking one gradient step on each iteration of samples, with advantages
@@ -33,6 +32,8 @@ class AverageA2C(AveragePolicyGradientAlgo):
         if optim_kwargs is None:
             optim_kwargs = dict()
         save__init__args(locals())
+        self.eta = None  # initial estimation of average performance
+        self.value_bias = None  # initial estimation of average performance
 
     def initialize(self, *args, **kwargs):
         super().initialize(*args, **kwargs)
@@ -45,6 +46,7 @@ class AverageA2C(AveragePolicyGradientAlgo):
         if hasattr(self.agent, "update_obs_rms"):
             # NOTE: suboptimal--obs sent to device here and in agent(*inputs).
             self.agent.update_obs_rms(samples.env.observation)
+        eta, valueBias = self.update_eta(samples)
         self.optimizer.zero_grad()
         loss, entropy, perplexity = self.loss(samples)
         loss.backward()
@@ -52,9 +54,11 @@ class AverageA2C(AveragePolicyGradientAlgo):
         self.optimizer.step()
         opt_info = OptInfo(
             loss=loss.item(),
-            gradNorm=grad_norm,
+            gradNorm=grad_norm.item(),
             entropy=entropy.item(),
             perplexity=perplexity.item(),
+            eta=eta,
+            valueBias=valueBias,
         )
         self.update_counter += 1
         return opt_info

@@ -1,17 +1,14 @@
 config = dict(
     agent=dict(),
     algo=dict(
-        learning_rate=3e-4,
         lr_eta=0.1,
         rm_vbias_coeff=1.0,
-        clip_grad_norm=10.,
+        max_constraint_value=0.01,
         entropy_loss_coeff=0.01,
         gae_lambda=0.95,
         minibatches=20,
         epochs=10,
-        ratio_clip=0.2,
         normalize_advantage=False,
-        linear_lr_schedule=False,
     ),
     env=dict(id="Hopper-v3"),
     model=dict(normalize_observation=False),
