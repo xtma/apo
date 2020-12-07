@@ -7,7 +7,7 @@ from rlpyt.utils.quick_args import save__init__args
 from rlpyt.utils.tensor import valid_mean
 
 
-class AverageAC(AveragePolicyGradientAlgo):
+class AAC(AveragePolicyGradientAlgo):
     """
     Advantage Actor Critic algorithm (synchronous).  Trains the agent by
     taking one gradient step on each iteration of samples, with advantages
@@ -16,6 +16,7 @@ class AverageAC(AveragePolicyGradientAlgo):
 
     def __init__(
         self,
+        longrun=True,
         learning_rate=0.001,
         lr_eta=0.1,  # learning rate of average performance
         rm_vbias_coeff=0.1,  # remove value bias
@@ -25,8 +26,10 @@ class AverageAC(AveragePolicyGradientAlgo):
         optim_kwargs=None,
         clip_grad_norm=1.,
         initial_optim_state_dict=None,
+        discount=1.,
         gae_lambda=0.9,
         normalize_advantage=False,
+        bootstrap_timelimit=True,
     ):
         """Saves the input settings."""
         if optim_kwargs is None:
@@ -34,6 +37,11 @@ class AverageAC(AveragePolicyGradientAlgo):
         save__init__args(locals())
         self.eta = None  # initial estimation of average performance
         self.value_bias = None  # initial estimation of average performance
+        if not self.longrun:  # don't consider the long-run tricks
+            self.eta = 0
+            self.value_bias = 0
+            self.lr_eta = 0
+            self.rm_vbias_coeff = 0
 
     def initialize(self, *args, **kwargs):
         super().initialize(*args, **kwargs)

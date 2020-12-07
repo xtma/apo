@@ -1,6 +1,7 @@
 config = dict(
     agent=dict(),
     algo=dict(
+        longrun=True,
         learning_rate=3e-4,
         lr_eta=0.1,
         rm_vbias_coeff=1.0,
@@ -12,12 +13,13 @@ config = dict(
         ratio_clip=0.2,
         normalize_advantage=False,
         linear_lr_schedule=False,
+        bootstrap_timelimit=True,
     ),
     env=dict(id="Hopper-v3"),
     model=dict(normalize_observation=False),
     optim=dict(),
     runner=dict(
-        n_steps=1e6,
+        n_steps=3e6,
         log_interval_steps=2000 * 10,
     ),
     sampler=dict(

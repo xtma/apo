@@ -1,7 +1,7 @@
 import torch
 
 from apo.algos.apg.base import AveragePolicyGradientAlgo, OptInfo
-from rlpyt.agents.base import AgentInputs, AgentInputsRnn
+from rlpyt.agents.base import AgentInputs
 from rlpyt.utils.buffer import buffer_method, buffer_to
 from rlpyt.utils.collections import namedarraytuple
 from rlpyt.utils.misc import iterate_mb_idxs
@@ -11,7 +11,7 @@ from rlpyt.utils.tensor import valid_mean
 LossInputs = namedarraytuple("LossInputs", ["agent_inputs", "action", "return_", "advantage", "valid", "old_dist_info"])
 
 
-class AveragePPO(AveragePolicyGradientAlgo):
+class APPO(AveragePolicyGradientAlgo):
     """
     Proximal Policy Optimization algorithm.  Trains the agent by taking
     multiple epochs of gradient steps on minibatches of the training data at
@@ -21,6 +21,7 @@ class AveragePPO(AveragePolicyGradientAlgo):
 
     def __init__(
         self,
+        longrun=True,
         learning_rate=0.001,
         lr_eta=0.1,  # learning rate of average performance
         rm_vbias_coeff=0.1,  # remove value bias
@@ -30,12 +31,14 @@ class AveragePPO(AveragePolicyGradientAlgo):
         optim_kwargs=None,
         clip_grad_norm=1.,
         initial_optim_state_dict=None,
+        discount=1.,
         gae_lambda=0.9,
         minibatches=4,
         epochs=4,
         ratio_clip=0.1,
         linear_lr_schedule=True,
         normalize_advantage=False,
+        bootstrap_timelimit=True,
     ):
         """Saves input settings."""
         if optim_kwargs is None:
@@ -43,6 +46,11 @@ class AveragePPO(AveragePolicyGradientAlgo):
         save__init__args(locals())
         self.eta = None  # initial estimation of average performance
         self.value_bias = None  # initial estimation of average performance
+        if not self.longrun:  # don't consider the long-run tricks
+            self.eta = 0
+            self.value_bias = 0
+            self.lr_eta = 0
+            self.rm_vbias_coeff = 0
 
     def initialize(self, *args, **kwargs):
         """

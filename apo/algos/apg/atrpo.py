@@ -13,7 +13,7 @@ from rlpyt.utils.tensor import valid_mean
 LossInputs = namedarraytuple("LossInputs", ["agent_inputs", "action", "return_", "advantage", "valid", "old_dist_info"])
 
 
-class AverageTRPO(AveragePolicyGradientAlgo):
+class ATRPO(AveragePolicyGradientAlgo):
     """
     Average Trust Region Policy Optimization algorithm.  Trains the agent by taking
     multiple epochs of gradient steps on minibatches of the training data at
@@ -23,6 +23,7 @@ class AverageTRPO(AveragePolicyGradientAlgo):
 
     def __init__(
         self,
+        longrun=True,
         discount=0.99,
         learning_rate=0.001,
         lr_eta=0.1,  # learning rate of average performance
@@ -39,6 +40,7 @@ class AverageTRPO(AveragePolicyGradientAlgo):
         epochs=4,
         linear_lr_schedule=True,
         normalize_advantage=False,
+        bootstrap_timelimit=True,
     ):
         """Saves input settings."""
         if optim_kwargs is None:
@@ -46,6 +48,11 @@ class AverageTRPO(AveragePolicyGradientAlgo):
         save__init__args(locals())
         self.eta = None  # initial estimation of average performance
         self.value_bias = None  # initial estimation of average performance
+        if not self.longrun:  # don't consider the long-run tricks
+            self.eta = 0
+            self.value_bias = 0
+            self.lr_eta = 0
+            self.rm_vbias_coeff = 0
 
     def initialize(self, agent, n_itr, batch_spec, mid_batch_reset=False, examples=None, world_size=1, rank=0):
         """

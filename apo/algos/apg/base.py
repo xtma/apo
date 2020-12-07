@@ -1,5 +1,6 @@
 from collections import namedtuple
 
+import torch
 from apo.algos.utils import discount_return, generalized_advantage_estimation
 from rlpyt.algos.base import RlAlgorithm
 from rlpyt.algos.utils import valid_from_done
@@ -62,17 +63,29 @@ class AveragePolicyGradientAlgo(RlAlgorithm):
         done = done.type(reward.dtype)
 
         if self.gae_lambda == 1:  # GAE reduces to MC.
-            return_ = discount_return(reward, done, bv, self.eta)
+            return_ = discount_return(reward, done, bv, self.eta, self.discount)
             advantage = return_ - value
         else:
-            advantage, return_ = generalized_advantage_estimation(reward, value, done, bv, self.eta, self.gae_lambda)
+            advantage, return_ = generalized_advantage_estimation(
+                reward,
+                value,
+                done,
+                bv,
+                self.eta,
+                self.discount,
+                self.gae_lambda,
+            )
 
         return_ -= self.rm_vbias_coeff * self.value_bias
 
         if not self.mid_batch_reset or self.agent.recurrent:
             valid = valid_from_done(done)  # Recurrent: no reset during training.
         else:
-            valid = None  # OR torch.ones_like(done)
+            valid = torch.ones_like(done)
+        if self.bootstrap_timelimit:
+            # To avoid non-use of bootstrap when environment is 'done' due to
+            # time-limit, turn off training on these samples.
+            valid *= (1 - samples.env.env_info.timeout.float())
 
         if self.normalize_advantage:
             if valid is not None:

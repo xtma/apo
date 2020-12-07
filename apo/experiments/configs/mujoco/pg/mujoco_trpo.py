@@ -14,7 +14,7 @@ config = dict(
     model=dict(normalize_observation=False),
     optim=dict(),
     runner=dict(
-        n_steps=1e6,
+        n_steps=3e6,
         log_interval_steps=2000 * 10,
     ),
     sampler=dict(
