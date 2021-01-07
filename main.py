@@ -28,6 +28,9 @@ def build_and_train(
     if algo_name == "appo":
         from apo.algos.apg.appo import APPO as Algo
         from apo.experiments.configs.mujoco.apg.mujoco_appo import config
+    elif algo_name == "appo2":
+        from apo.algos.apg.appo2 import APPO2 as Algo
+        from apo.experiments.configs.mujoco.apg.mujoco_appo import config
     elif algo_name == "aac":
         from apo.algos.apg.aac import AAC as Algo
         from apo.experiments.configs.mujoco.apg.mujoco_aac import config
@@ -78,7 +81,7 @@ def build_and_train(
         name = f"{algo_name}_g-{gamma}_l-{lamda}_{env_id}"
     else:
         name = f"{algo_name}_g-{gamma}_l-{lamda}_e-{lr_eta}_v-{rm_vb_coef}_{env_id}"
-    log_dir = f"data/{name}"
+    log_dir = f"data1/{name}"
     with logger_context(
             log_dir,
             run_ID,

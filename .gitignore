@@ -1,7 +1,11 @@
+# temp data files
+ppo_*/
+appo_*/
+
 # VSCode
 .vscode
 # log
-log/
+log*/
 # To store all experiment data locally only.
 data/
 # For quick local testing.

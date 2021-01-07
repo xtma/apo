@@ -7,6 +7,7 @@ config = dict(
         rm_vbias_coeff=1.0,
         clip_grad_norm=10.,
         entropy_loss_coeff=0.01,
+        discount=0.99,
         gae_lambda=0.95,
         minibatches=20,
         epochs=10,
