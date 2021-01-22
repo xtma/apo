@@ -26,9 +26,9 @@ from rlpyt.utils.launching.variant import VariantLevel, make_variants
 
 # Either manually set the resources for the experiment:
 # affinity_code = encode_affinity(
-#     n_cpu_core=120,
+#     n_cpu_core=128,
 #     n_gpu=8,
-#     contexts_per_gpu=12,
+#     contexts_per_gpu=2,
 #     # hyperthread_offset=8,  # if auto-detect doesn't work, number of CPU cores
 #     # n_socket=1,  # if auto-detect doesn't work, can force (or force to 1)
 #     # cpu_per_run=1,
