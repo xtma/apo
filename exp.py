@@ -16,7 +16,6 @@ from rlpyt.utils.logging.context import logger_context
 # from rlpyt.agents.pg.mujoco import MujocoFfAgent as Agent
 from apo.agents.mujoco_eval import MujocoFfEvalAgent as Agent
 from apo.algos.apg.appo import APPO as Algo
-from apo.envs.highway import make_highway_env
 from apo.envs.traj_info import AverageTrajInfo
 from apo.experiments.configs.mujoco.apg.mujoco_appo import config
 
@@ -27,11 +26,6 @@ def build_and_train(slot_affinity_code, log_dir, run_ID):
     variant = load_variant(log_dir)
     global config
     config = update_config(config, variant)
-
-    if config['env']['id'] == 'highway-v0':
-        env_cls = make_highway_env
-    else:
-        env_cls = gym_make
 
     sampler = Sampler(
         EnvCls=env_cls,

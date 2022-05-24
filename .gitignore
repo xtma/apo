@@ -1,6 +1,10 @@
 # temp data files
 ppo_*/
 appo_*/
+exp_*/
+hw_*/
+result/
+*.ipynb
 
 # VSCode
 .vscode
