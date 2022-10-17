@@ -13,4 +13,5 @@ This code is based [my forked version](https://github.com/xtma/rlpyt) of [rlpyt]
     journal={International Joint Conferences on Artificial Intelligence},
     pages={2797--2803},
     year={2021}
+}
 ```
